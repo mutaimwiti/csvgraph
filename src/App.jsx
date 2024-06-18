@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Plot from 'react-plotly.js';
 import Papa from 'papaparse';
 import { toPng } from 'html-to-image';
@@ -13,6 +13,22 @@ const scalingOptions = [
   { value: 100, label: 'x100' },
   { value: 1000, label: 'x1000' },
 ];
+
+const isPercentageField = (fieldName) => {
+  const lowerFieldName = fieldName.toLowerCase();
+  return lowerFieldName.includes('percent') || lowerFieldName.includes('%');
+};
+
+const calculateScalingFactor = (maxValue, fieldName) => {
+  if (isPercentageField(fieldName)) return 0.01;
+  if (maxValue === 0) return 1;
+  if (maxValue >= 1000) return 0.001;
+  if (maxValue > 100 && maxValue <= 1000) return 0.001;
+  if (maxValue > 50 && maxValue <= 100) return 0.01;
+  if (maxValue > 10 && maxValue <= 50) return 0.1;
+  if (maxValue > 1 && maxValue <= 10) return 1;
+  return 1;
+};
 
 const App = () => {
   const [csvData, setCsvData] = useState([]);
@@ -33,10 +49,25 @@ const App = () => {
       header: true,
       dynamicTyping: true,
       complete: (result) => {
-        const csvData = result.data;
+        const csvData = result.data.map(row => {
+          const newRow = {};
+          for (const key in row) {
+            newRow[key] = isNaN(row[key]) ? row[key] : Number(row[key]);
+          }
+          return newRow;
+        });
         setCsvData(csvData);
         const fieldNames = Object.keys(csvData[0]);
         setFields(fieldNames);
+
+        // Auto-determine scaling factors
+        const newScalingFactors = {};
+        fieldNames.forEach(field => {
+          const maxValue = Math.max(...csvData.map(row => isNaN(row[field]) ? 0 : row[field]));
+          newScalingFactors[field] = calculateScalingFactor(maxValue, field);
+          console.log(`Field: ${field}, Max Value: ${maxValue}, Scaling Factor: ${newScalingFactors[field]}`);
+        });
+        setScalingFactors(newScalingFactors);
       }
     });
   };
@@ -53,7 +84,7 @@ const App = () => {
 
   const formatScalingFactor = (factor) => {
     if (factor === 1) return '';
-    return ` (/ ${1 / factor})`;
+    return ` / ${1 / factor}`;
   };
 
   const generateGraph = () => {
@@ -62,12 +93,19 @@ const App = () => {
       return;
     }
 
-    const plotData = selectedFields.map((field) => ({
-      x: csvData.map((row) => row[xAxisField] * xAxisScalingFactor),
-      y: csvData.map((row) => row[field] * (scalingFactors[field] || 1)),
-      mode: 'lines',
-      name: `${field}${formatScalingFactor(scalingFactors[field] || 1)}`,
-    }));
+    const xAxisMaxValue = Math.max(...csvData.map(row => isNaN(row[xAxisField]) ? 0 : row[xAxisField]));
+    const xAxisNormalizationFactor = calculateScalingFactor(xAxisMaxValue, xAxisField);
+
+    const plotData = selectedFields.map((field) => {
+      const yAxisMaxValue = Math.max(...csvData.map(row => isNaN(row[field]) ? 0 : row[field]));
+      const yAxisNormalizationFactor = calculateScalingFactor(yAxisMaxValue, field);
+      return {
+        x: csvData.map((row) => !isNaN(row[xAxisField]) ? row[xAxisField] * xAxisNormalizationFactor : null).filter(v => v !== null),
+        y: csvData.map((row) => !isNaN(row[field]) ? row[field] * yAxisNormalizationFactor : null).filter(v => v !== null),
+        mode: 'lines',
+        name: `${field}${formatScalingFactor(yAxisNormalizationFactor)}`,
+      };
+    });
 
     setData(plotData);
     setShowForm(false);
@@ -85,6 +123,10 @@ const App = () => {
         console.error('Failed to download image', error);
       });
   };
+
+  useEffect(() => {
+    console.log('Scaling Factors:', scalingFactors);
+  }, [scalingFactors]);
 
   return (
     <div>
