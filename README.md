@@ -1,3 +1,3 @@
-# csv-graph-generator
+# csv-grapher
 
-CSV graph generator
+CSV grapher
