@@ -66,7 +66,6 @@ const App = () => {
         fieldNames.forEach(field => {
           const maxValue = Math.max(...csvData.map(row => isNaN(row[field]) ? 0 : row[field]));
           newScalingFactors[field] = calculateScalingFactor(maxValue, field);
-          console.log(`Field: ${field}, Max Value: ${maxValue}, Scaling Factor: ${newScalingFactors[field]}`);
         });
         setScalingFactors(newScalingFactors);
       }
@@ -131,10 +130,6 @@ const App = () => {
         console.error('Failed to download image', error);
       });
   };
-
-  useEffect(() => {
-    console.log('Scaling Factors:', scalingFactors);
-  }, [scalingFactors]);
 
   return (
     <div>
