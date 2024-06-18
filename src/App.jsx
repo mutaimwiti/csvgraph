@@ -8,7 +8,7 @@ const scalingOptions = [
   { value: 0.001, label: '/1000' },
   { value: 0.01, label: '/100' },
   { value: 0.1, label: '/10' },
-  { value: 1, label: 'None' },
+  { value: 1, label: 'x1' },
   { value: 10, label: 'x10' },
   { value: 100, label: 'x100' },
   { value: 1000, label: 'x1000' },
@@ -24,9 +24,11 @@ const App = () => {
   const [xAxisScalingFactor, setXAxisScalingFactor] = useState(1);
   const [showForm, setShowForm] = useState(true);
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const [fileName, setFileName] = useState('');
 
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
+    setFileName(file.name.split('.').slice(0, -1).join('.')); // Remove file extension
     Papa.parse(file, {
       header: true,
       dynamicTyping: true,
@@ -73,10 +75,11 @@ const App = () => {
 
   const downloadImage = () => {
     const node = document.getElementById('plot');
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-'); // Create a timestamp
 
     toPng(node, { pixelRatio: 2 })  // Increase pixelRatio for higher resolution
       .then((dataUrl) => {
-        download(dataUrl, 'graph.png');
+        download(dataUrl, `${fileName}-${timestamp}.png`);
       })
       .catch((error) => {
         console.error('Failed to download image', error);
@@ -132,7 +135,7 @@ const App = () => {
               <div id="plot">
                 <Plot
                   data={data}
-                  layout={{ title: 'Interactive Graph' }}
+                  layout={{ title: fileName }}
                 />
               </div>
               <button onClick={downloadImage}>Download PNG</button>
@@ -144,7 +147,7 @@ const App = () => {
         <div id="fullScreenPlot" style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'white', zIndex: 9999 }}>
           <Plot
             data={data}
-            layout={{ title: 'Interactive Graph', autosize: true }}
+            layout={{ title: fileName, autosize: true }}
             style={{ width: '100%', height: '100%' }}
           />
           <button onClick={() => setIsFullScreen(false)} style={{ position: 'fixed', top: 20, left: 20 }}>Exit Full Screen</button>
