@@ -23,7 +23,8 @@ const calculateScalingFactor = (maxValue, fieldName) => {
   if (isPercentageField(fieldName)) return 0.01;
   if (maxValue === 0) return 1;
   if (maxValue >= 1000) return 0.001;
-  if (maxValue > 100 && maxValue <= 1000) return 0.001;
+  if (maxValue > 500 && maxValue <= 1000) return 0.001;
+  if (maxValue > 100 && maxValue <= 500) return 0.01;
   if (maxValue > 50 && maxValue <= 100) return 0.01;
   if (maxValue > 10 && maxValue <= 50) return 0.1;
   if (maxValue > 1 && maxValue <= 10) return 1;
@@ -79,7 +80,16 @@ const App = () => {
   };
 
   const handleScalingChange = (field, factor) => {
-    setScalingFactors((prev) => ({ ...prev, [field]: factor }));
+    if (field === xAxisField) {
+      setXAxisScalingFactor(factor);
+    } else {
+      setScalingFactors((prev) => ({ ...prev, [field]: factor }));
+    }
+  };
+
+  const handleXAxisFieldChange = (field) => {
+    setXAxisField(field);
+    setXAxisScalingFactor(scalingFactors[field] || 1);
   };
 
   const formatScalingFactor = (factor) => {
@@ -93,12 +103,10 @@ const App = () => {
       return;
     }
 
-    const xAxisMaxValue = Math.max(...csvData.map(row => isNaN(row[xAxisField]) ? 0 : row[xAxisField]));
-    const xAxisNormalizationFactor = calculateScalingFactor(xAxisMaxValue, xAxisField);
+    const xAxisNormalizationFactor = xAxisScalingFactor;
 
     const plotData = selectedFields.map((field) => {
-      const yAxisMaxValue = Math.max(...csvData.map(row => isNaN(row[field]) ? 0 : row[field]));
-      const yAxisNormalizationFactor = calculateScalingFactor(yAxisMaxValue, field);
+      const yAxisNormalizationFactor = scalingFactors[field] || 1;
       return {
         x: csvData.map((row) => !isNaN(row[xAxisField]) ? row[xAxisField] * xAxisNormalizationFactor : null).filter(v => v !== null),
         y: csvData.map((row) => !isNaN(row[field]) ? row[field] * yAxisNormalizationFactor : null).filter(v => v !== null),
@@ -137,7 +145,7 @@ const App = () => {
             <div>
               <div>
                 <h2>Select X-Axis Field</h2>
-                <select onChange={(e) => setXAxisField(e.target.value)} value={xAxisField}>
+                <select onChange={(e) => handleXAxisFieldChange(e.target.value)} value={xAxisField}>
                   <option value="" disabled>Select X-Axis Field</option>
                   {fields.map((field) => (
                     <option key={field} value={field}>{field}</option>
