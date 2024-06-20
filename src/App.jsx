@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Plot from 'react-plotly.js';
 import Papa from 'papaparse';
 import { toPng } from 'html-to-image';
@@ -23,8 +23,7 @@ const calculateScalingFactor = (maxValue, fieldName) => {
   if (isPercentageField(fieldName)) return 0.01;
   if (maxValue === 0) return 1;
   if (maxValue >= 1000) return 0.001;
-  if (maxValue > 500 && maxValue <= 1000) return 0.001;
-  if (maxValue > 100 && maxValue <= 500) return 0.01;
+  if (maxValue > 100 && maxValue <= 1000) return 0.001;
   if (maxValue > 50 && maxValue <= 100) return 0.01;
   if (maxValue > 10 && maxValue <= 50) return 0.1;
   if (maxValue > 1 && maxValue <= 10) return 1;
