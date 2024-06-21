@@ -166,7 +166,9 @@ const App = () => {
                     ))}
                     </tbody>
                   </table>
-                  <button onClick={generateGraph} style={{ background: "blue", color: "white", margin: "5px" }}>Generate</button>
+                  <button onClick={generateGraph} style={{ background: "blue", color: "white", margin: "5px" }}>
+                    Generate graph
+                  </button>
                   <div style={{ margin: "5px"}}>
                     <a href="/">Select another file</a>
                   </div>
@@ -182,7 +184,7 @@ const App = () => {
             layout={{ title: fileName, autosize: true }}
             style={{ width: '100%', height: '100%' }}
           />
-          <button onClick={() => setShowForm(true)} style={{ position: 'fixed', bottom: 20, right: 20, background: "red", color: "white" }}>Select fields</button>
+          <button onClick={() => setShowForm(true)} style={{ position: 'fixed', bottom: 20, right: 20, background: "red", color: "white" }}>Exit</button>
         </div>
       )}
     </div>
