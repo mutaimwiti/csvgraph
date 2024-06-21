@@ -37,7 +37,6 @@ const App = () => {
   const [xAxisField, setXAxisField] = useState('');
   const [xAxisScalingFactor, setXAxisScalingFactor] = useState(1);
   const [showForm, setShowForm] = useState(true);
-  const [isFullScreen, setIsFullScreen] = useState(false);
   const [fileName, setFileName] = useState('');
 
   const handleFileUpload = (event) => {
@@ -117,20 +116,18 @@ const App = () => {
 
   return (
     <div>
-      {!isFullScreen && (
-        <div>
-          <input type="file" onChange={handleFileUpload} />
-          {showForm ? (
-            <div>
-              <div>
-                <table>
-                  <thead>
+      {showForm ? (
+          <div style={{ marginLeft: "20px"}}>
+            {fileName ? (
+                <>
+                  <table>
+                    <thead>
                     <tr>
-                      <th>Field</th>
-                      <th>Scale</th>
+                      <th align="left">Field</th>
+                      <th align="left">Scale</th>
                     </tr>
-                  </thead>
-                  <tbody>
+                    </thead>
+                    <tbody>
                     <tr>
                       <td>
                         <select onChange={(e) => handleXAxisFieldChange(e.target.value)} value={xAxisField}>
@@ -167,33 +164,25 @@ const App = () => {
                           </td>
                         </tr>
                     ))}
-                  </tbody>
-                </table>
-                <button onClick={generateGraph}>Generate Graph</button>
-              </div>
-            </div>
-          ) : (
-            <div>
-              <button onClick={() => setShowForm(true)}>Select Fields Again</button>
-              <button onClick={() => setIsFullScreen(true)}>Full Screen</button>
-              <div id="plot">
-                <Plot
-                  data={data}
-                  layout={{ title: fileName }}
-                />
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-      {isFullScreen && (
+                    </tbody>
+                  </table>
+                  <button onClick={generateGraph} style={{ background: "blue", color: "white", margin: "5px" }}>Generate</button>
+                  <div style={{ margin: "5px"}}>
+                    <a href="/">Select another file</a>
+                  </div>
+                </>
+            ) : (
+                <input type="file" onChange={handleFileUpload} />
+            )}
+          </div>
+      ) : (
         <div id="fullScreenPlot" style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'white', zIndex: 9999 }}>
           <Plot
             data={data}
             layout={{ title: fileName, autosize: true }}
             style={{ width: '100%', height: '100%' }}
           />
-          <button onClick={() => setIsFullScreen(false)} style={{ position: 'fixed', top: 20, left: 20 }}>Exit Full Screen</button>
+          <button onClick={() => setShowForm(true)} style={{ position: 'fixed', bottom: 20, right: 20, background: "red", color: "white" }}>Select fields</button>
         </div>
       )}
     </div>
