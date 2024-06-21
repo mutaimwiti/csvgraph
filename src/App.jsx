@@ -1,8 +1,6 @@
 import { useState } from 'react';
 import Plot from 'react-plotly.js';
 import Papa from 'papaparse';
-import { toPng } from 'html-to-image';
-import download from 'downloadjs';
 
 const scalingOptions = [
   { value: 0.001, label: '/1000' },
@@ -117,19 +115,6 @@ const App = () => {
     setShowForm(false);
   };
 
-  const downloadImage = () => {
-    const node = document.getElementById('plot');
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-'); // Create a timestamp
-
-    toPng(node, { pixelRatio: 2 })  // Increase pixelRatio for higher resolution
-      .then((dataUrl) => {
-        download(dataUrl, `${fileName}-${timestamp}.png`);
-      })
-      .catch((error) => {
-        console.error('Failed to download image', error);
-      });
-  };
-
   return (
     <div>
       {!isFullScreen && (
@@ -197,7 +182,6 @@ const App = () => {
                   layout={{ title: fileName }}
                 />
               </div>
-              <button onClick={downloadImage}>Download PNG</button>
             </div>
           )}
         </div>
