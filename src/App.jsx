@@ -138,37 +138,52 @@ const App = () => {
           {showForm ? (
             <div>
               <div>
-                <h2>Select X-Axis Field</h2>
-                <select onChange={(e) => handleXAxisFieldChange(e.target.value)} value={xAxisField}>
-                  <option value="" disabled>Select X-Axis Field</option>
-                  {fields.map((field) => (
-                    <option key={field} value={field}>{field}</option>
-                  ))}
-                </select>
-                <select onChange={(e) => setXAxisScalingFactor(Number(e.target.value))} value={xAxisScalingFactor}>
-                  {scalingOptions.map((option) => (
-                    <option key={option.value} value={option.value}>{option.label}</option>
-                  ))}
-                </select>
-                <label>{xAxisField}{formatScalingFactor(xAxisScalingFactor)}</label>
-              </div>
-              <div>
-                <h2>Select Fields</h2>
-                {fields.filter(field => field !== xAxisField).map((field) => (
-                  <div key={field}>
-                    <input 
-                      type="checkbox" 
-                      checked={selectedFields.includes(field)}
-                      onChange={() => handleFieldChange(field)} 
-                    />
-                    <label>{field}{formatScalingFactor(scalingFactors[field] || 1)}</label>
-                    <select onChange={(e) => handleScalingChange(field, Number(e.target.value))} value={scalingFactors[field] || 1}>
-                      {scalingOptions.map((option) => (
-                        <option key={option.value} value={option.value}>{option.label}</option>
-                      ))}
-                    </select>
-                  </div>
-                ))}
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Field</th>
+                      <th>Scale</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <select onChange={(e) => handleXAxisFieldChange(e.target.value)} value={xAxisField}>
+                          <option value="" disabled>Select X-Axis Field</option>
+                          {fields.map((field) => (
+                              <option key={field} value={field}>{field}</option>
+                          ))}
+                        </select>
+                      </td>
+                      <td>
+                        <select onChange={(e) => setXAxisScalingFactor(Number(e.target.value))} value={xAxisScalingFactor}>
+                          {scalingOptions.map((option) => (
+                              <option key={option.value} value={option.value}>{option.label}</option>
+                          ))}
+                        </select>
+                      </td>
+                    </tr>
+                    {fields.filter(field => field !== xAxisField).map((field) => (
+                        <tr key={field}>
+                          <td>
+                            <input
+                                type="checkbox"
+                                checked={selectedFields.includes(field)}
+                                onChange={() => handleFieldChange(field)}
+                            />
+                            <label>{field}</label>
+                          </td>
+                          <td>
+                            <select onChange={(e) => handleScalingChange(field, Number(e.target.value))} value={scalingFactors[field] || 1}>
+                              {scalingOptions.map((option) => (
+                                  <option key={option.value} value={option.value}>{option.label}</option>
+                              ))}
+                            </select>
+                          </td>
+                        </tr>
+                    ))}
+                  </tbody>
+                </table>
                 <button onClick={generateGraph}>Generate Graph</button>
               </div>
             </div>
