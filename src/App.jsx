@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import Plot from 'react-plotly.js';
 import Papa from 'papaparse';
 
@@ -181,7 +181,25 @@ const App = () => {
         <div id="fullScreenPlot" style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'white', zIndex: 9999 }}>
           <Plot
             data={data}
-            layout={{ title: fileName, autosize: true }}
+            layout={{ 
+              title: fileName, 
+              autosize: true,
+              xaxis: {
+                showgrid: true,
+                gridwidth: 1,
+                gridcolor: 'LightGray',
+                zeroline: true,
+                zerolinecolor: 'Black',
+              },
+              yaxis: {
+                showgrid: true,
+                gridwidth: 1,
+                gridcolor: 'LightGray',
+                zeroline: true,
+                zerolinecolor: 'Black',
+              },
+              plot_bgcolor: 'White' 
+            }}
             style={{ width: '100%', height: '100%' }}
           />
           <button onClick={() => setShowForm(true)} style={{ position: 'fixed', bottom: 20, right: 20, background: "red", color: "white" }}>Exit</button>
